@@ -2064,5 +2064,201 @@ window.TEXTS = [
 "g": "g9",
 "w": 80,
 "t": "Förändringen av partiets namn i början av 1990-talet beskrivs ofta som en vändpunkt, men flera av de analyserade källorna visar att den inte innebar ett fullständigt brott med tidigare nätverk och traditioner. Vissa av partiets företrädare har under lång tid funnits i organisationen, och de kan därmed fungera som bärare av äldre idéer. Samtidigt har partiet under senare decennier attraherat nya grupper, såsom unga väljare och personer med feministisk och miljöinriktad profil, vilket har bidragit till en breddad ideologisk bas."
+},
+{
+"id": "0ibyy",
+"k": "f",
+"g": "g178",
+"w": 82,
+"t": "Sådana skillnader i hur man tänker och vad man tycker är viktigt kan göra det svårt att samarbeta och att man inte riktigt vet hur man bäst ska hjälpa folk som söker jobb. Därför är det mycket viktig att man hela tiden pratar med varandra och försöker samordna sig så att det funkar bra och att man tänker på vad dom som söker jobb verkligen behöver. Det framgår tydligt i intervjuerna att Arbetsförmedlingen är mycket viktig, det understryker organisationens betydande institutionella inflytande."
+},
+{
+"id": "url65",
+"k": "f",
+"g": "g178",
+"w": 53,
+"t": "Att ha ett jobb är inte bara viktigt för pengarna, utan också för att känna sig inkluderad i samhället och utvecklas som person. Att vara arbetslös kan göra att man känner sig utanför och får sämre självförtroende. Psykisk ohälsa bland arbetslösa är ett problem för hela samhället och behöver lösas på flera sätt."
+},
+{
+"id": "b4kj4",
+"k": "f",
+"g": "g178",
+"w": 80,
+"t": "Rådgivningen är också viktig för att man ska veta vilka rättigheter och skyldigheter man har, vilket kan göra att man känner sig mer säker och har mer kontroll över situationen. Genom att erbjuda både pengar och någon att prata med, kan Arbetsförmedlingen hjälpa folk att känna sig starkare och göra det lättare att komma tillbaka till jobb. Starrin & Svensson (2002) pratar också om hur samhället ser på arbetslöshet, och det spelar en stor roll i hur man upplever situationen."
+},
+{
+"id": "hbi6j",
+"k": "f",
+"g": "g179",
+"w": 76,
+"t": "Denna osäkerhet kan leda till att vissa förslag aldrig tas upp till behandling, eftersom de inte anses uppfylla kraven, men utan tydlighet kring vem som har mandat att fatta beslutet. Ur ett demokratiskt perspektiv aktualiseras därmed frågan om legitimitet: Vem bör ha befogenhet att avgöra om ett förslag får gå vidare? Det skulle kunna argumenteras för att en sådan bedömning bör ske genom en omröstning bland politiker, för att säkerställa demokratisk förankring och transparens i beslutsprocessen."
+},
+{
+"id": "lvhkp",
+"k": "f",
+"g": "g179",
+"w": 77,
+"t": "Däremot har alla kommuner och regioner med e-förslag information om tjänsten på sina webbplatser, vilket visar hur digitalisering kan bidra till ökad tillgänglighet och medvetenhet kring möjligheten att lämna in e-förslag. Att samtliga kommuner med e-förslag även har en e-tjänst för att skicka in dessa visar på hur digitala lösningar kan förenkla processen. Istället för att lämna in en fysisk blankett möjliggörs en smidigare hantering direkt hemifrån, vilket kan sänka tröskeln för deltagande i den lokala demokratin."
+},
+{
+"id": "o2drv",
+"k": "f",
+"g": "g179",
+"w": 75,
+"t": "Att majoriteten av kommunerna ställer krav på antalet röster skapar en tröskel som kan begränsa vilka förslag som faktiskt går vidare. Syftet kan vara att filtrera bort förslag i stora mängder, men risken är att även relevanta förslag som inte lyckas få tillräcklig uppmärksamhet faller bort. Detta står i kontrast till möjligheten att som enskild individ väcka en fråga, vilket i sin tur kan leda till att vissa röster inte inkluderas i den politiska dagordningen."
+},
+{
+"id": "auk7v",
+"k": "f",
+"g": "g179",
+"w": 91,
+"t": "Detta innebär att den som vill ta reda på vilka regler som gäller behöver hitta och läsa det aktuella protokollet, vilket kan försvåra tillgången till information och leda till att många inte hittar de relevanta riktlinjerna. Att vissa kommuner, såsom Flens kommun, tillåter föreningar att lämna in e-förslag är särskilt intressant, eftersom det skapar möjligheter för en mer strukturerad organisering. Enskilda individer kan exempelvis bilda en förening för att driva en kampanj kring ett specifikt förslag, vilket kan stärka engagemanget och bidra till ett mer organiserat deltagande i den lokala demokratin."
+},
+{
+"id": "wzzut",
+"k": "f",
+"g": "g23",
+"w": 56,
+"t": "Ekman och Krzyżanowski (2021) illustrerar hur diskursen kring migration i svenska medier genomgick ett betydande skifte under flyktingkrisen 2015. Det som började som en marginell angelägenhet förvandlades till en fokuspunkt i både nyhetsbevakning och politisk dialog. Mediernas inramning av migration som en kris spelade en betydande roll i att legitimera en övergång till mer restriktiv politik."
+},
+{
+"id": "kw95r",
+"k": "f",
+"g": "g23",
+"w": 83,
+"t": "Denna forskning kommer att tillämpa interdiskursivitet som ett verktyg för att kontextualisera mediebevakningen av flyktingkrisen 2015 (Syrien) och 2022 (Ukraina) och undersöka hur olika mediebolag omtolkar och omvandlar etablerade narrativ om flyktingar i relation till tidsmässiga element, politiska sammanhang och publikens uppfattningar. Dessutom tar den tredje dimensionen, sociokulturell praktik, upp de övergripande sociala strukturer och ideologiska ramverk som formar produktionen och distributionen av diskurser. Detta innebär att placera textens innehåll och dess diskursiva kontext inom dynamiken i maktrelationer, institutionella normer och kulturella uppfattningar."
+},
+{
+"id": "2f4qk",
+"k": "f",
+"g": "g24",
+"w": 49,
+"t": "Lokala skillnader är viktiga, men faller utanför denna studies syfte och omfattning. Slutligen bör det noteras att forskaren roll i intervjusituationen kan ha påverkat svaren. Som student kan man uppfattas som mindre hotfull än en journalist eller forskare med myndighetsuppdrag, vilket potentiellt kan ha skapat en mer öppen samtalston."
+},
+{
+"id": "ks4rf",
+"k": "f",
+"g": "g24",
+"w": 57,
+"t": "Genom att inte enbart fokusera på vad som sägs, utan även hur det sägs och i vilket sammanhang, har det varit möjligt att identifiera ideologiska spänningar mellan ett repressivt och ett skadereducerande förhållningssätt. En möjlig begränsning med denna metod är att tolkningen av språket alltid är subjektiv. Forskarens egen förförståelse och värderingar kan påverka hur materialet analyseras."
+},
+{
+"id": "gy134",
+"k": "f",
+"g": "g24",
+"w": 60,
+"t": "De beskriver en vardag där narkotika inte bara är ett isolerat problem, utan en central komponent i ett större nätverk av kriminalitet, social utsatthet och samhällsutmaningar. En återkommande poäng i intervjun är att narkotikabrott inte kan beaktas som enskilda händelser. I stället ses de som en del av ett större ekosystem av brottslighet där narkotika fungerar som en ekonomisk motor."
+},
+{
+"id": "o5og2",
+"k": "f",
+"g": "g24",
+"w": 64,
+"t": "Metod och material – etiska övervägningar. För att samla in empiri användes halvstrukturerade intervjuer, en metod som enligt Kvale och Brinkmann (2021) lämpar sig väl för att undersöka människors subjektiva erfarenheter och den mening de tillskriver sin verklighet. Intervjuerna genomfördes utifrån en intervjuguide med öppna och tematiska frågor, vilka formulerades för att stimulera reflektion och berättande snarare än för att söka efter förutbestämda svar."
+},
+{
+"id": "080op",
+"k": "f",
+"g": "g24",
+"w": 95,
+"t": "Att intervjuerna genomfördes i en öppen och utforskande ton syftade även till att skapa en trygg samtalssituation där deltagarna kunde tala fritt och reflektera över sina erfarenheter med egna ord. Detta är i linje med diskursanalytiska ambitioner att inte bara fokusera på innehållet i det som sägs, utan också på hur det sägs, och vilka underliggande normer, maktrelationer eller identitetsskapande processer som därigenom uttrycks. Den insamlade empirin analyserades med hjälp av diskursanalys, ett metodologiskt tillvägagångssätt som syftar till att synliggöra hur språk används för att skapa mening, forma identiteter och upprätthålla eller utmana sociala ordningar."
+},
+{
+"id": "xn7yf",
+"k": "f",
+"g": "g24",
+"w": 49,
+"t": "Urvalet syftar således inte till att uppnå representativitet, utan till att belysa olika ideologiska och kunskapsmässiga positioner i frågan om cannabislegalisering. Det begränsade urvalet, endast två intervjuer, innebär att studiens resultat inte kan generaliseras till en bredare population. Detta påverkar tillförlitligheten och gör att resultaten bör betraktas som explorativa."
+},
+{
+"id": "td8ng",
+"k": "f",
+"g": "g25",
+"w": 57,
+"t": "Analysen har särskilt inriktats på teman som ansvar, skuld, likgiltighet, rasifiering och geopolitisk positionering. Syftet har varit att förstå hur dessa teman används för att bygga upp olika berättelser om våldet och lidandet i de båda konflikterna. Av särskilt intresse har varit att undersöka vilka berättelser som ges legitimitet i mediebevakningen, samt vilka som marginaliseras eller försvagas."
+},
+{
+"id": "1ab91",
+"k": "f",
+"g": "g25",
+"w": 66,
+"t": "På vilket sätt gestaltas de centrala aktörerna i narrativa roller som offer, hjältar, förövare eller passiva åskådare? Det är viktigt att betona att bedömningen av begreppsbruket inte är en personlig värdering, utan en analys av hur politiska och mediala aktörer själva väljer sina ord, och vilka politiska och moraliska effekter dessa val får. Studien syftar till att blottlägga dessa mekanismer, snarare än att själv kategorisera händelserna."
+},
+{
+"id": "nq15n",
+"k": "f",
+"g": "g25",
+"w": 80,
+"t": "Även om termen ”folkmord” nämns, sker det främst i relation till domslut från internationella domstolar snarare än som en självständig nyhetsbeskrivning (BBC News, 2005). Detta tyder på en mer försiktig eller juridiskt inriktad behandling av begreppet i den europeiska kontexten. Skillnaderna i språkbruk och tonfall mellan artiklarna kan spegla en bredare tendens i västerländsk mediebevakning att kontextualisera folkmord i Afrika som etniskt motiverat våld, medan liknande händelser i Europa i högre grad behandlas inom ramen för internationell politik och rättvisa."
+},
+{
+"id": "1wpk1",
+"k": "f",
+"g": "g25",
+"w": 59,
+"t": "Händelserna framställs som en följd av etnisk uppdelning och en planerad utrotningskampanj, där det internationella samfundets passivitet starkt kritiseras (BBC News, 2005). Den etniska dimensionen lyfts alltså fram som en central orsak till våldet. I kontrast beskrivs händelserna i Srebrenica framför allt som en ”massaker” och fokuserar mer på de rättsliga efterspelen än på den etniska bakgrunden till våldet."
+},
+{
+"id": "6a6yh",
+"k": "f",
+"g": "g26",
+"w": 56,
+"t": "För att uppnå detta genomfördes flera genomläsningar med fokus på både explicita och implicita uttryck av hot, legitimitet och aktörspositioner. Denna fas var avgörande för att bygga upp en kontextuell förståelse för texternas syfte och struktur innan kodningen påbörjades. 2. Identifiering och kodning av textavsnitt: Här har specifika delar av materialet markerats och kategoriserats enligt kodningsramen."
+},
+{
+"id": "5o3xs",
+"k": "f",
+"g": "g26",
+"w": 54,
+"t": "Det innebär att andra aspekter av säkerhetisering som yttrats i exempelvis media, folkopinion eller försvarsdebatter utanför riksdagen inte omfattas. Studien inkluderar inte heller intervjuer eller alternativa datakällor, vilket hade kunnat ge ytterligare djup och variation till analysen. Utöver det innehållsmässiga och metodologiska arbetet har vi även stött på praktiska svårigheter kopplade till uppsatsens formatering."
+},
+{
+"id": "h88jb",
+"k": "f",
+"g": "g26",
+"w": 42,
+"t": "Koderna formulerades både induktivt – utifrån materialet självt och deduktivt utifrån teoriavsnittet. Flera textpassager har kodats med överlappande etiketter för att möjliggöra analys av hur exempelvis hotbeskrivning och legitimering samverkar. Kodningen har kontinuerligt reviderats och diskuterats för att uppnå intern tillförlitlighet. 3."
+},
+{
+"id": "bld63",
+"k": "f",
+"g": "g26",
+"w": 36,
+"t": "Datainsamlingen skedde genom sökning i offentliga arkiv och riksdagens öppna databaser. Samtliga dokument har laddats ner och granskats i sin helhet. I den tematiska analysen identifierades återkommande teman som rörde säkerhetshot, aktörer, åtgärder samt begreppslig inramning."
+},
+{
+"id": "inoux",
+"k": "f",
+"g": "g27",
+"w": 59,
+"t": "Genom dessa formuleringar framställs invasionen inte enbart som en konflikt mellan Ryssland och Ukraina, utan som ett bredare hot mot europeisk säkerhet och internationell stabilitet. Macron betonar även behovet av långsiktighet och menar att Frankrike och dess partners måste vara “ready for a prolonged conflict” (Élysée, 2023). I talet lyfts vikten av europeiskt samarbete samt samordning med internationella partners."
+},
+{
+"id": "jugn3",
+"k": "f",
+"g": "g27",
+"w": 77,
+"t": "På så sätt kopplas sanktionerna till en bredare säkerhetspolitisk linje där europeiskt samarbete, militär kapacitet och långsiktigt stöd till Ukraina hänger samman. I det andra uttalandet, publicerat av det franska utrikesdepartementet, redogörs sanktionerna i mer konkreta och detaljerade termer. Dokumentet beskriver att EU:s sanktioner syftar till att begränsa Rysslands ekonomiska och militära kapacitet samt försvåra finansieringen av kriget, bland annat genom åtgärder som bidrar till “hampering Russia’s ongoing war effort” (Ministry for Europe and Foreign Affairs, 2026)."
+},
+{
+"id": "3bsrp",
+"k": "f",
+"g": "g27",
+"w": 50,
+"t": "På så sätt blir makt analysbart genom att undersöka vilka problem som görs synliga, vilka lösningar som framställs som självklara och vilka aktörer eller intressen som ges tolkningsföreträde. Kodningen utgår från ett antal analytiska dimensioner som kopplas till studiens WPRinspirerade analysfrågor: Hur representeras problemet? Vilka antaganden ligger bakom denna representation?"
+},
+{
+"id": "wglii",
+"k": "f",
+"g": "g27",
+"w": 69,
+"t": "Den fjärde rör enighetskonstruktion, där fokus ligger på hur EU framställer medlemsstaterna som samlade, handlingskraftiga och solidariska. Här används frågan Hur framställs EU som enhälliga? för att analysera vilka föreställningar som möjliggör bilden av EU som en enad aktör. Det kan exempelvis handla om antaganden om att medlemsstaterna delar samma säkerhetspolitiska intressen, samma syn på Ryssland som hot och samma förståelse av sanktioner som ett legitimt och nödvändigt svar."
+},
+{
+"id": "ejexg",
+"k": "f",
+"g": "g27",
+"w": 53,
+"t": "De individuella sanktionerna omfattar bland annat “asset freezes and an EU entry ban” (Ministry for Europe and Foreign Affairs, 2026). Utöver detta behandlas även åtgärder som syftar till att motverka kringgående av sanktioner. Det framgår att aktörer i tredjeländer som bidrar till att kringgå eller underlätta brott mot sanktionerna kan omfattas av restriktioner."
 }
 ];
