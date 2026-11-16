@@ -119,6 +119,8 @@
   </div>
   <div class="row">
     <button class="btn" id="btn-next" disabled>Nästa</button>
+    <button class="btn ghost" id="btn-skip" type="button">Nytt par, jag har sett en av texterna förut</button>
+    <button class="btn ghost" id="btn-pass" type="button">Hoppa över det här paret</button>
     <span class="muted small" id="g-hint">Välj en text för att gå vidare.</span>
   </div>
 </section>
@@ -163,7 +165,7 @@
 <script>
 (function(){
   "use strict";
-  const CFG = Object.assign({ENDPOINT:"",ROUNDS:10,N_CONTROL:5,N_FLAGGED:5,MAX_WORD_DIFF:12}, window.CONFIG||{});
+  const CFG = Object.assign({ENDPOINT:"",ROUNDS:10,N_CONTROL:5,N_FLAGGED:5,MAX_WORD_DIFF:12,SKIP_MAX:3}, window.CONFIG||{});
   const T = window.TEXTS || [];
   const LS_KEY = "gissa_ai_sessions_v1";
   const $ = id => document.getElementById(id);
@@ -173,31 +175,46 @@
   function show(id){ ["start","game","result"].forEach(s=>$(s).classList.toggle("hidden",s!==id)); window.scrollTo(0,0); }
   function uid(){ const b=new Uint8Array(8); (window.crypto||{getRandomValues:a=>a.forEach((_,i)=>a[i]=Math.random()*256)}).getRandomValues(b); return Array.from(b,x=>x.toString(16).padStart(2,"0")).join(""); }
 
-  function pickDistinct(arr,n){
-    const sh=shuffle(arr), out=[], seen=new Set();
-    for(const t of sh){ if(!seen.has(t.g)){ out.push(t); seen.add(t.g); if(out.length===n) break; } }
+  const SEEN_KEY="gissa_ai_seen_v1";
+  function loadSeen(){ try{ return new Set(JSON.parse(localStorage.getItem(SEEN_KEY)||"[]")); }catch(e){ return new Set(); } }
+  function markSeen(ids){ try{ const s=loadSeen(); ids.forEach(i=>s.add(i)); localStorage.setItem(SEEN_KEY,JSON.stringify(Array.from(s))); }catch(e){} }
+  function unseenFirst(arr,seen){ const sh=shuffle(arr); return sh.filter(t=>!seen.has(t.id)).concat(sh.filter(t=>seen.has(t.id))); }
+  function pickDistinct(arr,n,seen){
+    const sh=unseenFirst(arr,seen), out=[], gs=new Set();
+    for(const t of sh){ if(!gs.has(t.g)){ out.push(t); gs.add(t.g); if(out.length===n) break; } }
     for(const t of sh){ if(out.length>=n) break; if(!out.includes(t)) out.push(t); }
     return out;
   }
-  function buildPairs(){
-    const ctrl=T.filter(t=>t.k==="c"), flag=T.filter(t=>t.k==="f"), hum=T.filter(t=>t.k==="h");
-    const ai=shuffle(pickDistinct(ctrl,CFG.N_CONTROL).concat(pickDistinct(flag,CFG.N_FLAGGED)));
-    const used=new Set(), pairs=[];
-    for(const a of ai){
-      const cand=hum.filter(h=>!used.has(h.id)).map(h=>({h,d:Math.abs(h.w-a.w)}));
-      let near=cand.filter(c=>c.d<=CFG.MAX_WORD_DIFF);
-      if(!near.length){ cand.sort((x,y)=>x.d-y.d); near=cand.slice(0,5); }
-      const h=near[Math.floor(Math.random()*near.length)].h; used.add(h.id);
-      const aiPos=Math.random()<0.5?"A":"B";
-      pairs.push({ai:a,hum:h,aiPos});
-    }
-    return pairs;
+  function makePair(a,usedHum,seen){
+    const hum=T.filter(t=>t.k==="h" && !usedHum.has(t.id));
+    const cand=hum.map(h=>({h,d:Math.abs(h.w-a.w)}));
+    let near=cand.filter(c=>c.d<=CFG.MAX_WORD_DIFF);
+    if(!near.length){ cand.sort((x,y)=>x.d-y.d); near=cand.slice(0,5); }
+    const fresh=near.filter(c=>!seen.has(c.h.id)); if(fresh.length) near=fresh;
+    const h=near[Math.floor(Math.random()*near.length)].h; usedHum.add(h.id);
+    return {ai:a,hum:h,aiPos:Math.random()<0.5?"A":"B"};
+  }
+  function buildPairs(seen,usedHum){
+    const ctrl=T.filter(t=>t.k==="c"), flag=T.filter(t=>t.k==="f");
+    const ai=shuffle(pickDistinct(ctrl,CFG.N_CONTROL,seen).concat(pickDistinct(flag,CFG.N_FLAGGED,seen)));
+    return ai.map(a=>makePair(a,usedHum,seen));
+  }
+  // ersätt ett överhoppat par med ett nytt av samma AI-typ
+  function replacementFor(kind){
+    const usedAI=new Set(); S.pairs.forEach(p=>usedAI.add(p.ai.id)); S.skips.forEach(r=>usedAI.add(r.ai));
+    const usedG=new Set(S.pairs.filter(p=>p.ai.k===kind).map(p=>p.ai.g));
+    const pool=T.filter(t=>t.k===kind && !usedAI.has(t.id));
+    if(!pool.length) return null;
+    const sh=unseenFirst(pool,S.seen);
+    const a=sh.find(t=>!usedG.has(t.g) && !S.seen.has(t.id)) || sh.find(t=>!S.seen.has(t.id)) || sh[0];
+    return makePair(a,S.usedHum,S.seen);
   }
 
   let S=null; // sessionstillstånd
   function startSession(){
     if(T.length<30){ alert("Textdatabasen saknas (data.js)."); return; }
-    S={ id:uid(), role:$("q-role").value, exp:$("q-ai").value, pairs:buildPairs(), i:0, answers:[], t0:0, sel:null };
+    const seen=loadSeen(), usedHum=new Set();
+    S={ id:uid(), role:$("q-role").value, exp:$("q-ai").value, seen:seen, usedHum:usedHum, pairs:buildPairs(seen,usedHum), i:0, answers:[], skips:[], t0:0, sel:null };
     show("game"); renderRound();
   }
   function renderRound(){
@@ -206,9 +223,28 @@
     $("g-bar").style.width=(S.i/n*100)+"%";
     const tA = p.aiPos==="A"?p.ai:p.hum, tB = p.aiPos==="A"?p.hum:p.ai;
     $("t-A").textContent=tA.t; $("t-B").textContent=tB.t;
-    S.sel=null; setSel(null);
+    markSeen([p.ai.id,p.hum.id]);
+    S.sel=null; setSel(null); updSkip();
     $("btn-next").textContent = (S.i===n-1) ? "Visa resultat" : "Nästa";
     S.t0=performance.now();
+  }
+  function updSkip(){
+    const left=(CFG.SKIP_MAX||3)-S.skips.filter(r=>r.choice==="seen").length, b=$("btn-skip");
+    b.disabled=left<=0; b.classList.toggle("hidden",left<=0);
+  }
+  function skip(){
+    const p=S.pairs[S.i];
+    const rep=replacementFor(p.ai.k);
+    if(!rep){ updSkip(); return; }
+    S.skips.push({ n:S.i+1, ai:p.ai.id, hum:p.hum.id, kind:p.ai.k, aiPos:p.aiPos, choice:"seen", correct:"", ms:Math.round(performance.now()-S.t0) });
+    S.pairs[S.i]=rep; S.firstMs=0;
+    renderRound();
+  }
+  function pass(){
+    const p=S.pairs[S.i];
+    S.skips.push({ n:S.i+1, ai:p.ai.id, hum:p.hum.id, kind:p.ai.k, aiPos:p.aiPos, choice:"pass", correct:"", ms:Math.round(performance.now()-S.t0) });
+    S.pairs.splice(S.i,1); S.firstMs=0;
+    if(S.i>=S.pairs.length) finish(); else renderRound();
   }
   function setSel(x){
     S.sel=x;
@@ -252,14 +288,14 @@
   function finish(){
     $("g-bar").style.width="100%";
     const ans=S.answers, total=ans.length, ok=ans.reduce((s,a)=>s+a.correct,0);
-    const pl={ v:1, session:S.id, ts:new Date().toISOString(), role:S.role, exp:S.exp, rounds:ans };
+    const pl={ v:1, session:S.id, ts:new Date().toISOString(), role:S.role, exp:S.exp, rounds:ans.concat(S.skips) };
     persist(pl);
     $("r-score").textContent=ok+"/"+total;
     const cs=ans.filter(a=>a.kind==="c"), fs=ans.filter(a=>a.kind==="f");
     const c1=cs.reduce((s,a)=>s+a.correct,0), f1=fs.reduce((s,a)=>s+a.correct,0);
     $("r-text").innerHTML="";
     const msg=document.createElement("p"); msg.style.margin="0";
-    msg.textContent = ok>=9?"Mycket bra. Du hittade nästan alla.": ok>=7?"Bra, men flera par var svåra.": ok>=5?"Ungefär som slumpen eller något bättre.":"Under slumpen. Vissa av texterna är svåra att avgöra.";
+    msg.textContent = total===0?"Du hoppade över alla par.": ok>=9?"Mycket bra. Du hittade nästan alla.": ok>=7?"Bra, men flera par var svåra.": ok>=5?"Ungefär som slumpen eller något bättre.":"Under slumpen. Vissa av texterna är svåra att avgöra.";
     $("r-text").appendChild(msg);
     stats($("r-stats"),[
       ["AI-skrivna kontrolltexter", c1+" av "+cs.length+" rätt"],
@@ -295,7 +331,7 @@
   function loadAll(){
     if(!CFG.ENDPOINT) return;
     fetch(CFG.ENDPOINT+(CFG.ENDPOINT.includes("?")?"&":"?")+"action=rows").then(r=>r.json()).then(j=>{
-      const rows=(j.rows||[]).slice(1); if(!rows.length) return;
+      const rows=(j.rows||[]).slice(1).filter(r=>r[9]==="A"||r[9]==="B"); if(!rows.length) return;
       // kolumner: ts, session, role, exp, n, ai, hum, kind, aiPos, choice, correct, ms
       const sess=new Set(rows.map(r=>r[1]));
       const tot=rows.length, ok=rows.reduce((s,r)=>s+(+r[10]||0),0);
@@ -328,6 +364,8 @@
   // ---------- händelser ----------
   $("btn-start").addEventListener("click",startSession);
   $("btn-next").addEventListener("click",next);
+  $("btn-skip").addEventListener("click",skip);
+  $("btn-pass").addEventListener("click",pass);
   $("btn-again").addEventListener("click",()=>{ show("start"); });
   $("c-A").addEventListener("click",()=>choose("A"));
   $("c-B").addEventListener("click",()=>choose("B"));

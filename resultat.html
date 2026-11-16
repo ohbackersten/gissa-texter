@@ -28,6 +28,7 @@
   <p><button class="btn" id="csv">Ladda ner alla svar (CSV)</button></p>
   <h2>Andel rätt per typ av AI-text</h2>
   <table id="t-kind"></table>
+  <p class="muted">Par som bytts ut (deltagaren sa sig ha sett en av texterna förut, choice = seen) och par som hoppats över (choice = pass) ingår inte i andelarna nedan. De finns kvar i CSV-filen.</p>
   <p class="muted">Rätt = deltagaren pekade ut AI-texten. Slumpen är 50 %. 95 %-intervallet är Wilson-intervall och räknar alla par som oberoende, vilket överskattar säkerheten eftersom samma deltagare bidrar med flera par.</p>
   <h2>Per vana att använda språkmodeller</h2>
   <table id="t-exp"></table>
@@ -44,13 +45,14 @@
   var C=window.CONFIG||{}, $=function(i){return document.getElementById(i)};
   if(!C.ENDPOINT){ $("status").textContent="ENDPOINT saknas i config.js."; return; }
   fetch(C.ENDPOINT+(C.ENDPOINT.indexOf("?")>=0?"&":"?")+"action=rows").then(function(r){return r.json()}).then(function(j){
-    var head=j.rows[0], rows=j.rows.slice(1).map(function(r){var o={};head.forEach(function(h,i){o[h]=r[i]});return o});
+    var head=j.rows[0], all=j.rows.slice(1).map(function(r){var o={};head.forEach(function(h,i){o[h]=r[i]});return o});
+    var seen=all.filter(function(r){return r.choice==="seen"}), passed=all.filter(function(r){return r.choice==="pass"}), rows=all.filter(function(r){return r.choice==="A"||r.choice==="B"});
     if(!rows.length){ $("status").textContent="Inga svar ännu."; return; }
     $("status").textContent="Uppdaterad "+new Date().toLocaleString("sv-SE");
     $("out").hidden=false;
-    var sess={}; rows.forEach(function(r){sess[r.session]=1});
+    var sess={}; all.forEach(function(r){sess[r.session]=1});
     var ok=sum(rows);
-    box($("top"),[["Deltagare",Object.keys(sess).length],["Bedömda par",rows.length],["Andel rätt",pct(ok,rows.length)]]);
+    box($("top"),[["Deltagare",Object.keys(sess).length],["Bedömda par",rows.length],["Andel rätt",pct(ok,rows.length)],["Bytta par (sett förut)",seen.length],["Överhoppade par",passed.length]]);
     var KL={c:"AI-skriven (kontroll)",f:"Pangram-flaggad"};
     table($("t-kind"),["Typ","Par","Rätt","Andel","95 %-intervall"],["c","f"].map(function(k){return row(KL[k],rows.filter(function(r){return r.kind===k}))}).concat([row("Alla",rows)]));
     table($("t-exp"),["Svar","Par","Rätt","Andel","95 %-intervall"],grp(rows,"exp"));
