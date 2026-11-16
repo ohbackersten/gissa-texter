@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Gissa AI – sammanställning</title>
+<style>
+  body{margin:0;background:#f6f4ef;color:#1f2933;font:16px/1.5 system-ui,sans-serif}
+  main{max-width:960px;margin:0 auto;padding:24px 16px 60px}
+  h1{margin:0 0 .3em} h2{margin:1.6em 0 .5em;font-size:1.15rem}
+  table{border-collapse:collapse;background:#fff;width:100%;font-size:.95rem}
+  th,td{border:1px solid #d9d5cb;padding:6px 10px;text-align:left}
+  th{background:#efece3}
+  td.n{text-align:right;font-variant-numeric:tabular-nums}
+  .btn{background:#0f5c63;color:#fff;border:0;border-radius:8px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer}
+  .muted{color:#667085;font-size:.9rem}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .st{background:#fff;border:1px solid #d9d5cb;border-radius:10px;padding:12px}.st b{display:block;font-size:1.5rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Sammanställning</h1>
+<p class="muted" id="status">Hämtar…</p>
+<div id="out" hidden>
+  <div class="grid" id="top"></div>
+  <p><button class="btn" id="csv">Ladda ner alla svar (CSV)</button></p>
+  <h2>Andel rätt per typ av AI-text</h2>
+  <table id="t-kind"></table>
+  <p class="muted">Rätt = deltagaren pekade ut AI-texten. Slumpen är 50 %. 95 %-intervallet är Wilson-intervall och räknar alla par som oberoende, vilket överskattar säkerheten eftersom samma deltagare bidrar med flera par.</p>
+  <h2>Per vana att använda språkmodeller</h2>
+  <table id="t-exp"></table>
+  <h2>Per vana att bedöma studenttexter</h2>
+  <table id="t-role"></table>
+  <h2>Svåraste och lättaste AI-texter</h2>
+  <table id="t-item"></table>
+  <p class="muted">Endast AI-texter med minst 5 bedömningar. Id:n kan slås upp i den privata nyckeln (nyckel_items.csv).</p>
+</div>
+</main>
+<script src="config.js"></script>
+<script>
+(function(){
+  var C=window.CONFIG||{}, $=function(i){return document.getElementById(i)};
+  if(!C.ENDPOINT){ $("status").textContent="ENDPOINT saknas i config.js."; return; }
+  fetch(C.ENDPOINT+(C.ENDPOINT.indexOf("?")>=0?"&":"?")+"action=rows").then(function(r){return r.json()}).then(function(j){
+    var head=j.rows[0], rows=j.rows.slice(1).map(function(r){var o={};head.forEach(function(h,i){o[h]=r[i]});return o});
+    if(!rows.length){ $("status").textContent="Inga svar ännu."; return; }
+    $("status").textContent="Uppdaterad "+new Date().toLocaleString("sv-SE");
+    $("out").hidden=false;
+    var sess={}; rows.forEach(function(r){sess[r.session]=1});
+    var ok=sum(rows);
+    box($("top"),[["Deltagare",Object.keys(sess).length],["Bedömda par",rows.length],["Andel rätt",pct(ok,rows.length)]]);
+    var KL={c:"AI-skriven (kontroll)",f:"Pangram-flaggad"};
+    table($("t-kind"),["Typ","Par","Rätt","Andel","95 %-intervall"],["c","f"].map(function(k){return row(KL[k],rows.filter(function(r){return r.kind===k}))}).concat([row("Alla",rows)]));
+    table($("t-exp"),["Svar","Par","Rätt","Andel","95 %-intervall"],grp(rows,"exp"));
+    table($("t-role"),["Svar","Par","Rätt","Andel","95 %-intervall"],grp(rows,"role"));
+    var by={}; rows.forEach(function(r){(by[r.ai]=by[r.ai]||[]).push(r)});
+    var items=Object.keys(by).filter(function(k){return by[k].length>=5}).map(function(k){return [k,by[k].length,sum(by[k]),sum(by[k])/by[k].length,by[k][0].kind]}).sort(function(a,b){return a[3]-b[3]});
+    table($("t-item"),["Id","Typ","Bedömningar","Rätt","Andel"],items.map(function(x){return [x[0],KL[x[4]],x[1],x[2],pct(x[2],x[1])]}));
+    $("csv").onclick=function(){
+      var L=[head.join(",")]; j.rows.slice(1).forEach(function(r){L.push(r.join(","))});
+      var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([L.join("\n")],{type:"text/csv"})); a.download="gissa_ai_alla_svar.csv"; a.click();
+    };
+  }).catch(function(e){ $("status").textContent="Kunde inte hämta data: "+e; });
+  function sum(a){return a.reduce(function(s,r){return s+(+r.correct||0)},0)}
+  function pct(a,b){return b?Math.round(1000*a/b)/10+" %":"–"}
+  function wilson(k,n){ if(!n) return "–"; var z=1.96,p=k/n,d=1+z*z/n,c=p+z*z/(2*n),m=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n)); return Math.round(1000*(c-m)/d)/10+"–"+Math.round(1000*(c+m)/d)/10+" %"}
+  function row(l,a){var k=sum(a);return [l,a.length,k,pct(k,a.length),wilson(k,a.length)]}
+  function grp(rows,f){var g={};rows.forEach(function(r){var v=r[f]||"(ej angivet)";(g[v]=g[v]||[]).push(r)});return Object.keys(g).sort().map(function(v){return row(v,g[v])})}
+  function box(el,l){el.innerHTML="";l.forEach(function(x){var d=document.createElement("div");d.className="st";var b=document.createElement("b");b.textContent=x[1];d.appendChild(b);d.appendChild(document.createTextNode(x[0]));el.appendChild(d)})}
+  function table(el,h,rs){el.innerHTML="";var t=document.createElement("tr");h.forEach(function(x){var c=document.createElement("th");c.textContent=x;t.appendChild(c)});el.appendChild(t);
+    rs.forEach(function(r){var tr=document.createElement("tr");r.forEach(function(x,i){var c=document.createElement("td");if(i>0)c.className="n";c.textContent=x;tr.appendChild(c)});el.appendChild(tr)})}
+})();
+</script>
+</body>
+</html>

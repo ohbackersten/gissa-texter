@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Gissa AI – vilken text är skriven av en språkmodell?</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#ffffff; --ink:#1f2933; --muted:#667085; --line:#d9d5cb;
+    --accent:#0f5c63; --accent-ink:#ffffff; --accent-soft:#e3f0f1;
+    --good:#2b7a3d; --good-soft:#e5f3e8; --bad:#a63d2f; --bad-soft:#f8e7e4;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  main{max-width:920px;margin:0 auto;padding:28px 18px 60px}
+  h1{font-size:1.9rem;line-height:1.2;margin:0 0 .4em}
+  h2{font-size:1.25rem;margin:1.4em 0 .5em}
+  p{margin:.6em 0}
+  .muted{color:var(--muted)}
+  .small{font-size:.9rem}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .btn{appearance:none;border:0;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:600;padding:12px 22px;border-radius:10px;cursor:pointer}
+  .btn:hover{filter:brightness(1.08)}
+  .btn:disabled{background:#b7c4c6;cursor:not-allowed;filter:none}
+  .btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+  .btn:focus-visible,.choice:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #f2b84b;outline-offset:2px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .hidden{display:none !important}
+  label{display:block;margin:.8em 0 .25em;font-weight:600;font-size:.95rem}
+  select{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;width:100%;max-width:360px}
+  ul.plain{margin:.4em 0 .4em 1.1em;padding:0}
+  /* spel */
+  .progress{height:8px;background:#e4e0d6;border-radius:99px;overflow:hidden;margin:6px 0 18px}
+  .progress>div{height:100%;background:var(--accent);transition:width .25s}
+  .topline{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0 18px}
+  @media (max-width:720px){.pair{grid-template-columns:1fr}}
+  .choice{display:flex;flex-direction:column;text-align:left;font:inherit;color:inherit;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:18px;cursor:pointer;min-height:100%}
+  .choice:hover{border-color:#8fb6ba}
+  .choice[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+  .choice .tag{font-weight:700;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  .choice .txt{font-family:Georgia,"Times New Roman",serif;font-size:1.05rem;line-height:1.6}
+  .question{font-weight:600;margin:4px 0}
+  /* resultat */
+  .score{font-size:3rem;font-weight:800;line-height:1;color:var(--accent)}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .stat b{display:block;font-size:1.5rem}
+  details.round{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:0}
+  details.round>summary{cursor:pointer;padding:12px 16px;list-style:none;display:flex;gap:12px;align-items:center}
+  details.round>summary::-webkit-details-marker{display:none}
+  .badge{display:inline-block;font-weight:700;font-size:.8rem;padding:2px 9px;border-radius:99px}
+  .badge.ok{background:var(--good-soft);color:var(--good)} .badge.no{background:var(--bad-soft);color:var(--bad)}
+  .reveal{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px 16px}
+  @media (max-width:720px){.reveal{grid-template-columns:1fr}}
+  .rv{border:1px solid var(--line);border-radius:10px;padding:12px}
+  .rv.ai{border-color:#c9a14a;background:#fff9ec}
+  .rv .lab{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .rv .t{font-family:Georgia,serif;font-size:.98rem}
+  .note{border-left:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0}
+  footer{margin-top:30px;color:var(--muted);font-size:.85rem}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+
+<!-- STARTSIDA -->
+<section id="start">
+  <h1>Kan du se vilken text som är skriven av en språkmodell?</h1>
+  <p class="muted">En liten övning för lärare och forskare vid statsvetenskap, Mälardalens universitet.</p>
+
+  <div class="panel">
+    <p>Du får se <b>10 par</b> av korta textavsnitt, tre meningar vardera. I varje par är <b>en text AI-genererad</b> och <b>en är troligen skriven av en människa</b>. Din uppgift är att välja vilken som är den AI-genererade. Du får inget facit förrän alla tio paren är klara.</p>
+    <p>Texterna kommer från ett urval kandidatuppsatser i statsvetenskap och från texter som en språkmodell skrivit i uppsatsstil. Övningen är en del av en förstudie om hur väl AI-detektorn Pangram fungerar, och dina svar hjälper oss att se hur väl <i>människor</i> klarar samma uppgift.</p>
+
+    <h2>Vad sparas?</h2>
+    <ul class="plain small">
+      <li>Dina val, hur lång tid varje val tog och två frivilliga uppgifter nedan.</li>
+      <li>Ingen inloggning, inga namn och inga cookies. Svaren sparas anonymt med ett slumpmässigt id.</li>
+      <li>Resultaten används för att beskriva hur grupper bedömer texterna, inte för att bedöma enskilda personer.</li>
+    </ul>
+
+    <h2>Frivilliga uppgifter</h2>
+    <label for="q-role">Hur ofta bedömer du studenttexter?</label>
+    <select id="q-role">
+      <option value="">Vill inte svara</option>
+      <option value="ofta">Ofta (flera gånger per termin)</option>
+      <option value="ibland">Ibland (någon gång per år)</option>
+      <option value="sallan">Sällan eller aldrig</option>
+    </select>
+    <label for="q-ai">Hur ofta använder du själv språkmodeller (t.ex. ChatGPT, Claude, Copilot) för text?</label>
+    <select id="q-ai">
+      <option value="">Vill inte svara</option>
+      <option value="dagligen">Dagligen eller nästan dagligen</option>
+      <option value="veckovis">Någon gång i veckan</option>
+      <option value="sallan">Någon gång i månaden eller sällan</option>
+      <option value="aldrig">Aldrig</option>
+    </select>
+
+    <div class="row" style="margin-top:22px">
+      <button class="btn" id="btn-start">Starta</button>
+      <span class="muted small">Tar ungefär fem minuter.</span>
+    </div>
+  </div>
+  <footer id="foot-start"></footer>
+</section>
+
+<!-- SPEL -->
+<section id="game" class="hidden" aria-live="polite">
+  <div class="topline"><div><b id="g-count">Par 1 av 10</b></div><div class="muted small">Välj med musen eller tangenterna A och B, bekräfta med Enter</div></div>
+  <div class="progress"><div id="g-bar" style="width:0%"></div></div>
+  <p class="question">Vilken av texterna är AI-genererad?</p>
+  <div class="pair">
+    <button class="choice" id="c-A" aria-pressed="false"><span class="tag">Text A</span><span class="txt" id="t-A"></span></button>
+    <button class="choice" id="c-B" aria-pressed="false"><span class="tag">Text B</span><span class="txt" id="t-B"></span></button>
+  </div>
+  <div class="row">
+    <button class="btn" id="btn-next" disabled>Nästa</button>
+    <span class="muted small" id="g-hint">Välj en text för att gå vidare.</span>
+  </div>
+</section>
+
+<!-- RESULTAT -->
+<section id="result" class="hidden">
+  <h1>Ditt resultat</h1>
+  <div class="panel">
+    <div class="row" style="gap:22px">
+      <div><div class="score" id="r-score">0/10</div><div class="muted small">rätt</div></div>
+      <div id="r-text" style="flex:1;min-width:240px"></div>
+    </div>
+    <div class="stats" id="r-stats"></div>
+    <div class="note small">Slumpen ger 5 av 10. Med så få par säger ett enskilt resultat mycket lite om din förmåga. Det är gruppens samlade resultat som är intressant.</div>
+  </div>
+
+  <h2>Så svarade du, par för par</h2>
+  <div id="r-rounds"></div>
+
+  <div id="r-all" class="hidden">
+    <h2>Så har andra svarat</h2>
+    <div class="stats" id="r-all-stats"></div>
+    <p class="muted small" id="r-all-note"></p>
+  </div>
+
+  <div class="panel" style="margin-top:20px">
+    <h2 style="margin-top:0">Om texterna</h2>
+    <ul class="plain small">
+      <li><b>AI-skriven (kontroll):</b> skriven av en språkmodell (Claude) i uppsatsstil för den här studien. Facit är säkert.</li>
+      <li><b>Pangram-flaggad:</b> ett avsnitt ur en riktig kandidatuppsats som detektorn Pangram markerat som AI-genererat. Vi vet inte säkert hur texten skrevs, och en flaggning bevisar ingenting om en enskild student.</li>
+      <li><b>Mänsklig:</b> ett avsnitt ur en uppsats som Pangram klassat som mänskligt skriven. I de flesta fall är det troligen riktigt, men även det är inget facit.</li>
+    </ul>
+    <div class="row" style="margin-top:14px"><button class="btn" id="btn-again">Spela igen</button></div>
+  </div>
+  <footer id="foot-result"></footer>
+</section>
+
+</main>
+
+<script src="config.js"></script>
+<script src="data.js"></script>
+<script>
+(function(){
+  "use strict";
+  const CFG = Object.assign({ENDPOINT:"",ROUNDS:10,N_CONTROL:5,N_FLAGGED:5,MAX_WORD_DIFF:12}, window.CONFIG||{});
+  const T = window.TEXTS || [];
+  const LS_KEY = "gissa_ai_sessions_v1";
+  const $ = id => document.getElementById(id);
+  const KIND_LABEL = {c:"AI-skriven (kontroll)", f:"Pangram-flaggad", h:"Mänsklig"};
+
+  function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  function show(id){ ["start","game","result"].forEach(s=>$(s).classList.toggle("hidden",s!==id)); window.scrollTo(0,0); }
+  function uid(){ const b=new Uint8Array(8); (window.crypto||{getRandomValues:a=>a.forEach((_,i)=>a[i]=Math.random()*256)}).getRandomValues(b); return Array.from(b,x=>x.toString(16).padStart(2,"0")).join(""); }
+
+  function pickDistinct(arr,n){
+    const sh=shuffle(arr), out=[], seen=new Set();
+    for(const t of sh){ if(!seen.has(t.g)){ out.push(t); seen.add(t.g); if(out.length===n) break; } }
+    for(const t of sh){ if(out.length>=n) break; if(!out.includes(t)) out.push(t); }
+    return out;
+  }
+  function buildPairs(){
+    const ctrl=T.filter(t=>t.k==="c"), flag=T.filter(t=>t.k==="f"), hum=T.filter(t=>t.k==="h");
+    const ai=shuffle(pickDistinct(ctrl,CFG.N_CONTROL).concat(pickDistinct(flag,CFG.N_FLAGGED)));
+    const used=new Set(), pairs=[];
+    for(const a of ai){
+      const cand=hum.filter(h=>!used.has(h.id)).map(h=>({h,d:Math.abs(h.w-a.w)}));
+      let near=cand.filter(c=>c.d<=CFG.MAX_WORD_DIFF);
+      if(!near.length){ cand.sort((x,y)=>x.d-y.d); near=cand.slice(0,5); }
+      const h=near[Math.floor(Math.random()*near.length)].h; used.add(h.id);
+      const aiPos=Math.random()<0.5?"A":"B";
+      pairs.push({ai:a,hum:h,aiPos});
+    }
+    return pairs;
+  }
+
+  let S=null; // sessionstillstånd
+  function startSession(){
+    if(T.length<30){ alert("Textdatabasen saknas (data.js)."); return; }
+    S={ id:uid(), role:$("q-role").value, exp:$("q-ai").value, pairs:buildPairs(), i:0, answers:[], t0:0, sel:null };
+    show("game"); renderRound();
+  }
+  function renderRound(){
+    const p=S.pairs[S.i], n=S.pairs.length;
+    $("g-count").textContent="Par "+(S.i+1)+" av "+n;
+    $("g-bar").style.width=(S.i/n*100)+"%";
+    const tA = p.aiPos==="A"?p.ai:p.hum, tB = p.aiPos==="A"?p.hum:p.ai;
+    $("t-A").textContent=tA.t; $("t-B").textContent=tB.t;
+    S.sel=null; setSel(null);
+    $("btn-next").textContent = (S.i===n-1) ? "Visa resultat" : "Nästa";
+    S.t0=performance.now();
+  }
+  function setSel(x){
+    S.sel=x;
+    $("c-A").setAttribute("aria-pressed", x==="A"); $("c-B").setAttribute("aria-pressed", x==="B");
+    $("btn-next").disabled=!x;
+    $("g-hint").textContent = x ? ("Du har valt text "+x+" som AI-genererad.") : "Välj en text för att gå vidare.";
+  }
+  function choose(x){
+    if(S.sel===null && S.t0) S.firstMs=Math.round(performance.now()-S.t0);
+    setSel(x);
+  }
+  function next(){
+    if(!S.sel) return;
+    const p=S.pairs[S.i];
+    S.answers.push({ n:S.i+1, ai:p.ai.id, hum:p.hum.id, kind:p.ai.k, aiPos:p.aiPos, choice:S.sel,
+      correct: S.sel===p.aiPos ? 1:0, ms: S.firstMs||Math.round(performance.now()-S.t0) });
+    S.firstMs=0;
+    S.i++;
+    if(S.i>=S.pairs.length) finish(); else renderRound();
+  }
+
+  // ---------- spara ----------
+  function loadLS(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)||"[]"); }catch(e){ return []; } }
+  function saveLS(arr){ try{ localStorage.setItem(LS_KEY,JSON.stringify(arr)); }catch(e){} }
+  function sendPayload(pl){
+    if(!CFG.ENDPOINT) return Promise.resolve(false);
+    return fetch(CFG.ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(pl)}).then(()=>true).catch(()=>false);
+  }
+  function persist(pl){
+    const all=loadLS(); pl.sent=false; all.push(pl); saveLS(all);
+    sendPayload(pl).then(ok=>{ if(ok){ const a=loadLS(); const m=a.find(x=>x.session===pl.session); if(m){ m.sent=true; saveLS(a);} } });
+  }
+  function retryPending(){
+    if(!CFG.ENDPOINT) return;
+    const a=loadLS(); a.filter(x=>!x.sent).forEach(x=>sendPayload(x).then(ok=>{ if(ok){ const b=loadLS(); const m=b.find(y=>y.session===x.session); if(m){m.sent=true; saveLS(b);} } }));
+  }
+
+  // ---------- resultat ----------
+  const byId = id => T.find(t=>t.id===id);
+  function pct(a,b){ return b? Math.round(100*a/b)+" %" : "–"; }
+  function finish(){
+    $("g-bar").style.width="100%";
+    const ans=S.answers, total=ans.length, ok=ans.reduce((s,a)=>s+a.correct,0);
+    const pl={ v:1, session:S.id, ts:new Date().toISOString(), role:S.role, exp:S.exp, rounds:ans };
+    persist(pl);
+    $("r-score").textContent=ok+"/"+total;
+    const cs=ans.filter(a=>a.kind==="c"), fs=ans.filter(a=>a.kind==="f");
+    const c1=cs.reduce((s,a)=>s+a.correct,0), f1=fs.reduce((s,a)=>s+a.correct,0);
+    $("r-text").innerHTML="";
+    const msg=document.createElement("p"); msg.style.margin="0";
+    msg.textContent = ok>=9?"Mycket bra. Du hittade nästan alla.": ok>=7?"Bra, men flera par var svåra.": ok>=5?"Ungefär som slumpen eller något bättre.":"Under slumpen. Vissa av texterna är svåra att avgöra.";
+    $("r-text").appendChild(msg);
+    stats($("r-stats"),[
+      ["AI-skrivna kontrolltexter", c1+" av "+cs.length+" rätt"],
+      ["Pangram-flaggade avsnitt", f1+" av "+fs.length+" rätt"],
+      ["Genomsnittlig tid per par", Math.round(ans.reduce((s,a)=>s+a.ms,0)/Math.max(1,total)/1000)+" s"]
+    ]);
+    // par för par
+    const box=$("r-rounds"); box.innerHTML="";
+    S.pairs.forEach((p,i)=>{
+      const a=ans[i];
+      const d=document.createElement("details"); d.className="round";
+      const sm=document.createElement("summary");
+      const b=document.createElement("span"); b.className="badge "+(a.correct?"ok":"no"); b.textContent=a.correct?"Rätt":"Fel";
+      const tx=document.createElement("span"); tx.textContent="Par "+(i+1)+": du valde text "+a.choice+". AI-texten var text "+p.aiPos+" ("+KIND_LABEL[p.ai.k]+").";
+      sm.appendChild(b); sm.appendChild(tx); d.appendChild(sm);
+      const rv=document.createElement("div"); rv.className="reveal";
+      [["A",p.aiPos==="A"?p.ai:p.hum],["B",p.aiPos==="A"?p.hum:p.ai]].forEach(([lab,t])=>{
+        const isAi=t.k!=="h";
+        const el=document.createElement("div"); el.className="rv"+(isAi?" ai":"");
+        const l=document.createElement("div"); l.className="lab"; l.textContent="Text "+lab+" · "+KIND_LABEL[t.k];
+        const tt=document.createElement("div"); tt.className="t"; tt.textContent=t.t;
+        el.appendChild(l); el.appendChild(tt); rv.appendChild(el);
+      });
+      d.appendChild(rv); box.appendChild(d);
+    });
+    show("result");
+    loadAll(ok,total,c1,cs.length,f1,fs.length);
+    footer();
+  }
+  function stats(el,list){ el.innerHTML=""; list.forEach(([k,v])=>{ const d=document.createElement("div"); d.className="stat"; const b=document.createElement("b"); b.textContent=v; const s=document.createElement("span"); s.className="muted small"; s.textContent=k; d.appendChild(b); d.appendChild(s); el.appendChild(d); }); }
+
+  // aggregerat från alla deltagare (kräver ENDPOINT)
+  function loadAll(){
+    if(!CFG.ENDPOINT) return;
+    fetch(CFG.ENDPOINT+(CFG.ENDPOINT.includes("?")?"&":"?")+"action=rows").then(r=>r.json()).then(j=>{
+      const rows=(j.rows||[]).slice(1); if(!rows.length) return;
+      // kolumner: ts, session, role, exp, n, ai, hum, kind, aiPos, choice, correct, ms
+      const sess=new Set(rows.map(r=>r[1]));
+      const tot=rows.length, ok=rows.reduce((s,r)=>s+(+r[10]||0),0);
+      const kc=rows.filter(r=>r[7]==="c"), kf=rows.filter(r=>r[7]==="f");
+      stats($("r-all-stats"),[
+        ["Deltagare hittills", String(sess.size)],
+        ["Andel rätt, alla par", pct(ok,tot)],
+        ["Andel rätt, AI-skrivna kontrolltexter", pct(kc.reduce((s,r)=>s+(+r[10]||0),0),kc.length)],
+        ["Andel rätt, Pangram-flaggade avsnitt", pct(kf.reduce((s,r)=>s+(+r[10]||0),0),kf.length)]
+      ]);
+      $("r-all-note").textContent="Resultaten uppdateras när fler deltar. Din egen omgång kan dröja några sekunder innan den räknas med.";
+      $("r-all").classList.remove("hidden");
+    }).catch(()=>{});
+  }
+
+  function footer(){
+    const el=$("foot-result"); el.textContent="";
+    if(!CFG.ENDPOINT){
+      el.appendChild(document.createTextNode("Svaren sparas bara i den här webbläsaren. "));
+      const a=document.createElement("a"); a.href="#"; a.textContent="Ladda ner sparade svar (CSV)"; a.addEventListener("click",e=>{e.preventDefault(); downloadCSV();}); el.appendChild(a);
+    }
+  }
+  function downloadCSV(){
+    const all=loadLS(); const head=["session","ts","role","exp","n","ai","hum","kind","aiPos","choice","correct","ms"];
+    const lines=[head.join(",")];
+    all.forEach(s=>s.rounds.forEach(r=>lines.push([s.session,s.ts,s.role||"",s.exp||"",r.n,r.ai,r.hum,r.kind,r.aiPos,r.choice,r.correct,r.ms].join(","))));
+    const blob=new Blob([lines.join("\n")],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="gissa_ai_svar.csv"; a.click();
+  }
+
+  // ---------- händelser ----------
+  $("btn-start").addEventListener("click",startSession);
+  $("btn-next").addEventListener("click",next);
+  $("btn-again").addEventListener("click",()=>{ show("start"); });
+  $("c-A").addEventListener("click",()=>choose("A"));
+  $("c-B").addEventListener("click",()=>choose("B"));
+  document.addEventListener("keydown",e=>{
+    if($("game").classList.contains("hidden")) return;
+    if(e.target && /^(SELECT|INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    const k=e.key.toLowerCase();
+    if(k==="a"||k==="1") choose("A"); else if(k==="b"||k==="2") choose("B");
+    else if(k==="enter" && S && S.sel && e.target.tagName!=="BUTTON") next();
+  });
+  $("foot-start").textContent="Anonym förstudie. Inga personuppgifter samlas in.";
+  retryPending();
+})();
+</script>
+</body>
+</html>
